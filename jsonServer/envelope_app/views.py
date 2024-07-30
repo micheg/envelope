@@ -43,3 +43,28 @@ class EnvelopeCreateView(generics.CreateAPIView):
             'title': envelope.title,
             'data': envelope.data
         }, status=status.HTTP_201_CREATED)
+
+# Aggiorna un envelope esistente
+class EnvelopeUpdateView(generics.UpdateAPIView):
+    queryset = Envelope.objects.all()
+    serializer_class = EnvelopeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        envelope_id = kwargs.get('pk')
+        envelope = self.get_queryset().filter(id=envelope_id).first()
+        if not envelope:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        title = request.data.get('title')
+        data = request.data.get('data')
+
+        envelope.title = title if title is not None else envelope.title
+        envelope.data = data if data is not None else envelope.data
+        envelope.save()
+
+        return Response({
+            'id': envelope.id,
+            'title': envelope.title,
+            'data': envelope.data
+        }, status=status.HTTP_200_OK)

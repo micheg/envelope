@@ -9,4 +9,8 @@ class EnvelopeAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.JSONField: {'widget': JSONEditorWidget},
     }
+    def save_model(self, request, obj, form, change):
+        if obj.data is None:
+            obj.data = {}
+        super().save_model(request, obj, form, change)
 
